@@ -277,7 +277,7 @@ export default function AnalyticsPage() {
   const gridStroke = "oklch(1 0 0 / 6%)"
 
   return (
-    <div className="p-8 space-y-8">
+    <div className="p-8 space-y-8 overflow-y-auto flex-1">
 
       {/* ── Header ── */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">

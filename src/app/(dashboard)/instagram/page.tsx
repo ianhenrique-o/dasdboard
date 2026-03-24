@@ -294,7 +294,7 @@ export default function InstagramPage() {
   }
 
   return (
-    <div className="p-8 space-y-8">
+    <div className="p-8 space-y-8 overflow-y-auto flex-1">
 
       {/* ── Header ── */}
       <div className="flex items-center justify-between">
