@@ -2,7 +2,7 @@
 
 import { useState, useMemo, useCallback } from "react"
 import {
-  LineChart, Line, ResponsiveContainer, Tooltip,
+  LineChart, Line, Tooltip,
 } from "recharts"
 import {
   Users, Plus, Trash2, ExternalLink, TrendingUp, TrendingDown,
@@ -93,31 +93,35 @@ type PlatformFilter = Platform | typeof PLATFORM_ALL
 
 // ─── Sparkline ────────────────────────────────────────────────────────────────
 
+// Fixed dimensions (no ResponsiveContainer) — table cells break ResizeObserver
 function Sparkline({ data, positive }: { data: { week: number; value: number }[]; positive: boolean }) {
   const color = positive ? "#34d399" : "#f87171"
   return (
-    <ResponsiveContainer width={80} height={32}>
-      <LineChart data={data} margin={{ top: 4, right: 2, bottom: 4, left: 2 }}>
-        <Tooltip
-          content={({ active, payload }) => {
-            if (!active || !payload?.length) return null
-            return (
-              <div className="bg-card border border-border rounded px-2 py-1 text-[10px] text-foreground">
-                {fmtN(payload[0]?.value as number)}
-              </div>
-            )
-          }}
-        />
-        <Line
-          type="monotone"
-          dataKey="value"
-          stroke={color}
-          strokeWidth={1.5}
-          dot={false}
-          isAnimationActive={false}
-        />
-      </LineChart>
-    </ResponsiveContainer>
+    <LineChart
+      width={80}
+      height={32}
+      data={data}
+      margin={{ top: 3, right: 2, bottom: 3, left: 2 }}
+    >
+      <Tooltip
+        content={({ active, payload }) => {
+          if (!active || !payload?.length) return null
+          return (
+            <div className="bg-card border border-border rounded px-2 py-1 text-[10px] text-foreground shadow-lg">
+              {fmtN(payload[0]?.value as number)}
+            </div>
+          )
+        }}
+      />
+      <Line
+        type="monotone"
+        dataKey="value"
+        stroke={color}
+        strokeWidth={1.5}
+        dot={false}
+        isAnimationActive={false}
+      />
+    </LineChart>
   )
 }
 
