@@ -90,13 +90,13 @@ function NewsCard({ item }: { item: NewsItem }) {
   const tc = TOPIC_CONFIG[item.topic]
 
   return (
-    <Card className="hover:border-border/80 transition-colors group flex flex-col">
+    <Card className="group flex flex-col overflow-hidden">
       <CardContent className="pt-5 pb-4 flex flex-col flex-1 gap-0">
-        {/* Badges */}
-        <div className="flex items-center gap-1.5 mb-3 flex-wrap">
+        {/* Tópico */}
+        <div className="flex items-center gap-1.5 mb-3">
           <span
             className={cn(
-              "inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium border",
+              "inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-medium border",
               TOPIC_CONFIG[item.topic].bg
             )}
           >
@@ -105,23 +105,23 @@ function NewsCard({ item }: { item: NewsItem }) {
           </span>
         </div>
 
-        {/* Title */}
-        <h3 className="text-sm font-semibold text-foreground leading-snug mb-2 line-clamp-2">
+        {/* Manchete */}
+        <h3 className="text-sm font-semibold text-foreground/95 leading-snug mb-2.5 line-clamp-2 tracking-tight">
           {item.title}
         </h3>
 
-        {/* Summary */}
+        {/* Resumo */}
         <p className="text-xs text-muted-foreground leading-relaxed line-clamp-3 flex-1 mb-4">
           {item.summary || "Sem resumo disponível."}
         </p>
 
-        {/* Footer */}
-        <div className="flex items-center justify-between mt-auto border-t border-border/40 pt-3">
+        {/* Rodapé */}
+        <div className="flex items-center justify-between mt-auto border-t border-[oklch(1_0_0_/_6%)] pt-3">
           <div className="flex items-center gap-1.5 text-xs text-muted-foreground min-w-0">
-            <Clock className="w-3 h-3 shrink-0" />
-            <span className="font-medium text-foreground/70 truncate">{item.source}</span>
-            <span className="shrink-0">·</span>
-            <span className="shrink-0">{formatDate(item.publishedAt)}</span>
+            <Clock className="w-3 h-3 shrink-0 text-muted-foreground/50" />
+            <span className="font-medium text-foreground/60 truncate">{item.source}</span>
+            <span className="shrink-0 text-muted-foreground/40">·</span>
+            <span className="shrink-0 text-muted-foreground/70">{formatDate(item.publishedAt)}</span>
           </div>
 
           {item.link && item.link !== "#" && (
@@ -129,7 +129,7 @@ function NewsCard({ item }: { item: NewsItem }) {
               href={item.link}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground transition-colors shrink-0 ml-2 opacity-0 group-hover:opacity-100"
+              className="flex items-center gap-1 text-xs text-muted-foreground/60 hover:text-foreground transition-colors shrink-0 ml-2 opacity-0 group-hover:opacity-100"
             >
               Ler <ExternalLink className="w-3 h-3" />
             </a>
@@ -184,11 +184,11 @@ export default function NoticiasPage() {
       {/* ── Header ── */}
       <div className="flex items-center justify-between gap-4">
         <div className="flex items-center gap-3">
-          <div className="flex items-center justify-center w-10 h-10 rounded-xl bg-cyan-500/15">
+          <div className="flex items-center justify-center w-10 h-10 rounded-xl bg-cyan-500/12 border border-cyan-500/20">
             <Newspaper className="w-5 h-5 text-cyan-400" />
           </div>
           <div>
-            <h1 className="text-2xl font-bold text-foreground">Consolidador de Notícias</h1>
+            <h1 className="text-2xl font-bold text-foreground tracking-tight">Consolidador de Notícias</h1>
             <p className="text-sm text-muted-foreground">
               Marketing digital — feeds RSS em tempo real
               {data?.source === "mock" && (

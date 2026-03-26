@@ -315,11 +315,11 @@ export default function CalendarioPage() {
         {/* Header row */}
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="flex items-center justify-center w-10 h-10 rounded-xl bg-violet-500/15">
+            <div className="flex items-center justify-center w-10 h-10 rounded-xl bg-violet-500/12 border border-violet-500/20">
               <CalendarDays className="w-5 h-5 text-violet-400" />
             </div>
             <div>
-              <h1 className="text-2xl font-bold">Calendário de Conteúdo</h1>
+              <h1 className="text-2xl font-bold tracking-tight">Calendário de Conteúdo</h1>
               <p className="text-sm text-muted-foreground">
                 {counts.publicado} publicados · {counts.agendado} agendados · {counts.rascunho} rascunhos
               </p>

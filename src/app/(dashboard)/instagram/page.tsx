@@ -158,8 +158,8 @@ function formatSchedule(iso: string) {
 function PostCard({ post, onDelete }: { post: Post; onDelete: (id: number) => void }) {
   const sc = statusConfig[post.status]
   return (
-    <Card className="group hover:border-border/80 transition-colors">
-      <CardContent className="pt-5 pb-4">
+    <Card className="group flex flex-col">
+      <CardContent className="pt-5 pb-4 flex flex-col flex-1 gap-0">
         {/* top row */}
         <div className="flex items-start justify-between gap-2 mb-3">
           <div className="flex items-center gap-1.5 flex-wrap">
@@ -181,25 +181,25 @@ function PostCard({ post, onDelete }: { post: Post; onDelete: (id: number) => vo
         </div>
 
         {/* caption */}
-        <p className="text-sm text-foreground leading-relaxed line-clamp-3">
+        <p className="text-sm text-foreground/90 leading-relaxed line-clamp-3 flex-1">
           {post.caption}
         </p>
 
         {/* footer */}
         {(post.likes !== undefined || post.scheduledAt) && (
-          <div className="flex items-center gap-4 mt-4 text-xs text-muted-foreground border-t border-border/50 pt-3">
+          <div className="flex items-center gap-4 mt-4 text-xs text-muted-foreground border-t border-[oklch(1_0_0_/_6%)] pt-3">
             {post.status === "publicado" && post.likes !== undefined && (
               <>
-                <span className="flex items-center gap-1">
+                <span className="flex items-center gap-1.5 font-medium">
                   <Heart className="w-3.5 h-3.5 text-pink-400" /> {post.likes}
                 </span>
-                <span className="flex items-center gap-1">
-                  <MessageCircle className="w-3.5 h-3.5" /> {post.comments}
+                <span className="flex items-center gap-1.5 font-medium">
+                  <MessageCircle className="w-3.5 h-3.5 text-blue-400" /> {post.comments}
                 </span>
               </>
             )}
             {post.scheduledAt && (
-              <span className="flex items-center gap-1">
+              <span className="flex items-center gap-1.5">
                 <CalendarClock className="w-3.5 h-3.5 text-amber-400" />
                 {formatSchedule(post.scheduledAt)}
               </span>
@@ -299,11 +299,11 @@ export default function InstagramPage() {
       {/* ── Header ── */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <div className="flex items-center justify-center w-10 h-10 rounded-xl bg-pink-500/15">
+          <div className="flex items-center justify-center w-10 h-10 rounded-xl bg-pink-500/12 border border-pink-500/20">
             <Camera className="w-5 h-5 text-pink-400" />
           </div>
           <div>
-            <h1 className="text-2xl font-bold text-foreground">Gestor de Instagram</h1>
+            <h1 className="text-2xl font-bold text-foreground tracking-tight">Gestor de Instagram</h1>
             <p className="text-sm text-muted-foreground">Gerencie seus conteúdos por status</p>
           </div>
         </div>
@@ -316,20 +316,21 @@ export default function InstagramPage() {
       {/* ── Stats ── */}
       <div className="grid grid-cols-2 xl:grid-cols-4 gap-3">
         {[
-          { label: "Agendados", count: counts.agendado, icon: <CalendarClock className="w-4 h-4" />, color: "text-amber-400", bg: "bg-amber-500/10" },
-          { label: "Rascunhos", count: counts.rascunho, icon: <FileEdit className="w-4 h-4" />, color: "text-blue-400", bg: "bg-blue-500/10" },
-          { label: "Publicados", count: counts.publicado, icon: <CheckCircle2 className="w-4 h-4" />, color: "text-emerald-400", bg: "bg-emerald-500/10" },
-          { label: "Backlog", count: counts.backlog, icon: <Lightbulb className="w-4 h-4" />, color: "text-violet-400", bg: "bg-violet-500/10" },
+          { label: "Agendados",  count: counts.agendado,  icon: <CalendarClock className="w-4 h-4" />, color: "text-amber-400",   accent: "from-amber-500/50" },
+          { label: "Rascunhos",  count: counts.rascunho,  icon: <FileEdit      className="w-4 h-4" />, color: "text-blue-400",    accent: "from-blue-500/50" },
+          { label: "Publicados", count: counts.publicado, icon: <CheckCircle2  className="w-4 h-4" />, color: "text-emerald-400", accent: "from-emerald-500/50" },
+          { label: "Backlog",    count: counts.backlog,   icon: <Lightbulb     className="w-4 h-4" />, color: "text-violet-400",  accent: "from-violet-500/50" },
         ].map((s) => (
-          <Card key={s.label}>
-            <CardContent className="pt-5 pb-4">
-              <div className="flex items-center justify-between">
-                <p className="text-sm text-muted-foreground">{s.label}</p>
-                <div className={cn("w-7 h-7 rounded-lg flex items-center justify-center", s.bg)}>
+          <Card key={s.label} className="overflow-hidden">
+            <div className={cn("h-px bg-gradient-to-r to-transparent", s.accent)} />
+            <CardContent className="pt-4 pb-4">
+              <div className="flex items-center justify-between mb-3">
+                <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">{s.label}</p>
+                <div className="w-7 h-7 rounded-lg flex items-center justify-center border border-[oklch(1_0_0_/_7%)] bg-[oklch(1_0_0_/_3%)]">
                   <span className={s.color}>{s.icon}</span>
                 </div>
               </div>
-              <p className="text-3xl font-bold mt-2 tabular-nums">{s.count}</p>
+              <p className="text-3xl font-bold tabular-nums tracking-tight">{s.count}</p>
             </CardContent>
           </Card>
         ))}

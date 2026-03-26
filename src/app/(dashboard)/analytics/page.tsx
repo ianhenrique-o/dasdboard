@@ -119,11 +119,11 @@ function ChartCard({
 }) {
   return (
     <Card className={className}>
-      <CardHeader className="pb-2">
-        <CardTitle className="text-sm font-semibold">{title}</CardTitle>
-        {description && <CardDescription className="text-xs">{description}</CardDescription>}
+      <CardHeader className="pb-4">
+        <CardTitle className="text-sm font-semibold tracking-tight">{title}</CardTitle>
+        {description && <CardDescription className="text-xs mt-0.5">{description}</CardDescription>}
       </CardHeader>
-      <CardContent>{children}</CardContent>
+      <CardContent className="pt-0">{children}</CardContent>
     </Card>
   )
 }
@@ -141,39 +141,47 @@ function KpiCard({
   value,
   changePct,
   icon,
-  iconBg,
-  iconColor,
+  accentColor,
+  accentBg,
   loading,
 }: {
   label: string
   value: string
   changePct: number
   icon: React.ReactNode
-  iconBg: string
-  iconColor: string
+  accentColor: string
+  accentBg: string
   loading: boolean
 }) {
   const up = changePct >= 0
   return (
-    <Card>
-      <CardContent className="pt-5 pb-4">
-        <div className="flex items-start justify-between">
-          <p className="text-sm text-muted-foreground">{label}</p>
-          <div className={cn("w-8 h-8 rounded-lg flex items-center justify-center", iconBg)}>
-            <span className={iconColor}>{icon}</span>
+    <Card className="overflow-hidden">
+      {/* Barra de acento superior */}
+      <div className={cn("h-px w-full bg-gradient-to-r to-transparent", accentBg)} />
+      <CardContent className="pt-5 pb-5">
+        <div className="flex items-start justify-between mb-3">
+          <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">{label}</p>
+          <div className={cn(
+            "w-8 h-8 rounded-lg flex items-center justify-center",
+            "border border-[oklch(1_0_0_/_8%)] bg-[oklch(1_0_0_/_4%)]"
+          )}>
+            <span className={accentColor}>{icon}</span>
           </div>
         </div>
         {loading ? (
-          <Skeleton className="h-8 w-24 mt-2" />
+          <Skeleton className="h-9 w-28 mt-1" />
         ) : (
-          <p className="text-3xl font-bold mt-2 tabular-nums">{value}</p>
+          <p className="text-3xl font-bold tabular-nums tracking-tight">{value}</p>
         )}
         {loading ? (
-          <Skeleton className="h-4 w-28 mt-2" />
+          <Skeleton className="h-4 w-32 mt-2" />
         ) : (
-          <div className={cn("flex items-center gap-1 text-xs mt-2", up ? "text-emerald-400" : "text-red-400")}>
+          <div className={cn(
+            "flex items-center gap-1 text-xs mt-2 font-medium",
+            up ? "text-emerald-400" : "text-red-400"
+          )}>
             {up ? <TrendingUp className="w-3 h-3" /> : <TrendingDown className="w-3 h-3" />}
-            {up ? "+" : ""}{changePct.toFixed(1)}% vs período anterior
+            <span>{up ? "+" : ""}{changePct.toFixed(1)}% em relação ao período anterior</span>
           </div>
         )}
       </CardContent>
@@ -282,11 +290,11 @@ export default function AnalyticsPage() {
       {/* ── Header ── */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div className="flex items-center gap-3">
-          <div className="flex items-center justify-center w-10 h-10 rounded-xl bg-blue-500/15">
+          <div className="flex items-center justify-center w-10 h-10 rounded-xl bg-blue-500/12 border border-blue-500/20">
             <BarChart3 className="w-5 h-5 text-blue-400" />
           </div>
           <div>
-            <h1 className="text-2xl font-bold text-foreground">Analytics</h1>
+            <h1 className="text-2xl font-bold text-foreground tracking-tight">Analytics</h1>
             <p className="text-sm text-muted-foreground">
               Performance de conteúdo
               {data?.source === "mock" && (
@@ -299,15 +307,15 @@ export default function AnalyticsPage() {
         {/* Date controls */}
         <div className="flex flex-wrap items-center gap-2">
           {/* Presets */}
-          <div className="flex items-center gap-1 bg-secondary rounded-xl p-1">
+          <div className="flex items-center gap-1 bg-secondary rounded-lg p-1 border border-[oklch(1_0_0_/_5%)]">
             {PRESETS.map((p) => (
               <button
                 key={p.days}
                 onClick={() => applyPreset(p.days)}
                 className={cn(
-                  "px-3 py-1.5 rounded-lg text-xs font-medium transition-all",
+                  "px-3 py-1.5 rounded-md text-xs font-medium transition-all",
                   activePreset === p.days
-                    ? "bg-card text-foreground shadow-sm"
+                    ? "bg-card text-foreground shadow-[0_1px_3px_oklch(0_0_0_/_25%)] border border-[oklch(1_0_0_/_8%)]"
                     : "text-muted-foreground hover:text-foreground"
                 )}
               >
@@ -317,7 +325,7 @@ export default function AnalyticsPage() {
           </div>
 
           {/* Custom range */}
-          <div className="flex items-center gap-1.5 bg-secondary rounded-xl px-3 py-1.5">
+          <div className="flex items-center gap-1.5 bg-secondary rounded-lg px-3 py-1.5 border border-[oklch(1_0_0_/_5%)]">
             <CalendarDays className="w-3.5 h-3.5 text-muted-foreground" />
             <input
               type="date"
@@ -326,7 +334,7 @@ export default function AnalyticsPage() {
               onChange={(e) => setRange((r) => ({ ...r, startDate: e.target.value }))}
               className="bg-transparent text-xs text-foreground outline-none w-28 [color-scheme:dark]"
             />
-            <span className="text-muted-foreground text-xs">→</span>
+            <span className="text-muted-foreground/50 text-xs">→</span>
             <input
               type="date"
               value={range.endDate}
@@ -363,8 +371,8 @@ export default function AnalyticsPage() {
           value={s ? fmtNumber(s.impressions) : "—"}
           changePct={s?.impressionChangePct ?? 0}
           icon={<Eye className="w-4 h-4" />}
-          iconBg="bg-blue-500/10"
-          iconColor="text-blue-400"
+          accentBg="from-blue-500/60"
+          accentColor="text-blue-400"
           loading={loading}
         />
         <KpiCard
@@ -372,8 +380,8 @@ export default function AnalyticsPage() {
           value={s ? `${s.engagementRate.toFixed(1)}%` : "—"}
           changePct={s?.engagementChangePct ?? 0}
           icon={<Zap className="w-4 h-4" />}
-          iconBg="bg-pink-500/10"
-          iconColor="text-pink-400"
+          accentBg="from-pink-500/60"
+          accentColor="text-pink-400"
           loading={loading}
         />
         <KpiCard
@@ -381,8 +389,8 @@ export default function AnalyticsPage() {
           value={s ? (s.newFollowers >= 0 ? `+${fmtNumber(s.newFollowers)}` : fmtNumber(s.newFollowers)) : "—"}
           changePct={s?.followerGrowthPct ?? 0}
           icon={<Users className="w-4 h-4" />}
-          iconBg="bg-violet-500/10"
-          iconColor="text-violet-400"
+          accentBg="from-violet-500/60"
+          accentColor="text-violet-400"
           loading={loading}
         />
         <KpiCard
@@ -390,8 +398,8 @@ export default function AnalyticsPage() {
           value={s ? fmtNumber(s.reach) : "—"}
           changePct={s ? (s.impressionChangePct * 0.72) : 0}
           icon={<TrendingUp className="w-4 h-4" />}
-          iconBg="bg-emerald-500/10"
-          iconColor="text-emerald-400"
+          accentBg="from-emerald-500/60"
+          accentColor="text-emerald-400"
           loading={loading}
         />
       </div>
@@ -402,7 +410,7 @@ export default function AnalyticsPage() {
         {/* Impressões — Line Chart */}
         <ChartCard
           title="Impressões por dia"
-          description={`${fmtDate(range.startDate)} – ${fmtDate(range.endDate)}`}
+          description={`${fmtDate(range.startDate)} até ${fmtDate(range.endDate)}`}
         >
           {loading ? (
             <Skeleton className="h-52 w-full" />
@@ -450,8 +458,8 @@ export default function AnalyticsPage() {
 
         {/* Engajamento — Bar Chart */}
         <ChartCard
-          title="Taxa de engajamento (%)"
-          description="Média diária no período"
+          title="Taxa de engajamento"
+          description="Média diária no período selecionado"
         >
           {loading ? (
             <Skeleton className="h-52 w-full" />
@@ -506,7 +514,7 @@ export default function AnalyticsPage() {
       {/* ── Crescimento de seguidores — Area Chart ── */}
       <ChartCard
         title="Crescimento de seguidores"
-        description="Evolução da base ao longo do período"
+        description="Evolução da base ao longo do período selecionado"
       >
         {loading ? (
           <Skeleton className="h-52 w-full" />
@@ -559,12 +567,12 @@ export default function AnalyticsPage() {
         <CardHeader>
           <div className="flex items-center justify-between">
             <div>
-              <CardTitle className="text-sm font-semibold">Posts com Melhor Desempenho</CardTitle>
+              <CardTitle className="text-sm font-semibold tracking-tight">Melhores Publicações</CardTitle>
               <CardDescription className="text-xs mt-0.5">
-                Ordenados por impressões no período selecionado
+                Ordenadas por impressões no período selecionado
               </CardDescription>
             </div>
-            <div className="hidden lg:flex items-center gap-5 text-[10px] text-muted-foreground/60 uppercase tracking-wider pr-2">
+            <div className="hidden lg:flex items-center gap-5 text-[10px] text-muted-foreground/50 uppercase tracking-widest pr-2">
               <span className="w-16 text-right">Impressões</span>
               <span className="w-14 text-right">Curtidas</span>
               <span className="w-16 text-center">Engajamento</span>

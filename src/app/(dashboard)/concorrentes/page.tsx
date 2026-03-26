@@ -591,11 +591,11 @@ export default function ConcorrentesPage() {
       {/* ── Header ── */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <div className="flex items-center justify-center w-10 h-10 rounded-xl bg-orange-500/15">
+          <div className="flex items-center justify-center w-10 h-10 rounded-xl bg-orange-500/12 border border-orange-500/20">
             <Users className="w-5 h-5 text-orange-400" />
           </div>
           <div>
-            <h1 className="text-2xl font-bold">Rastreador de Concorrentes</h1>
+            <h1 className="text-2xl font-bold tracking-tight">Rastreador de Concorrentes</h1>
             <p className="text-sm text-muted-foreground">
               {competitors.length} perfis monitorados em {new Set(competitors.map(c => c.platform)).size} plataformas
             </p>
