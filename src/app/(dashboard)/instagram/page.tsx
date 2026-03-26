@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import {
   Camera,
   ImagePlus,
@@ -15,6 +15,11 @@ import {
   Clock,
   Trash2,
   MoreHorizontal,
+  Link2,
+  Link2Off,
+  AlertCircle,
+  ExternalLink,
+  User,
 } from "lucide-react"
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
@@ -36,6 +41,7 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { cn } from "@/lib/utils"
+import type { InstagramStatus } from "@/app/api/auth/instagram/status/route"
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -261,10 +267,138 @@ const defaultForm: FormState = {
 
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
+// ─── Connection Banner ────────────────────────────────────────────────────────
+
+function ConnectionBanner({
+  status,
+  onDisconnect,
+}: {
+  status: InstagramStatus
+  onDisconnect: () => void
+}) {
+  if (!status.configured) {
+    return (
+      <div className="flex items-start gap-3 px-4 py-3.5 rounded-xl border border-amber-500/20 bg-amber-500/8">
+        <AlertCircle className="w-4 h-4 text-amber-400 mt-0.5 shrink-0" />
+        <div className="flex-1 min-w-0">
+          <p className="text-sm font-medium text-amber-300">Meta App não configurado</p>
+          <p className="text-xs text-amber-400/70 mt-0.5">
+            Crie um <code className="font-mono bg-amber-500/15 px-1 rounded">.env.local</code> com{" "}
+            <code className="font-mono bg-amber-500/15 px-1 rounded">META_APP_ID</code> e{" "}
+            <code className="font-mono bg-amber-500/15 px-1 rounded">META_APP_SECRET</code>.{" "}
+            Veja o arquivo <code className="font-mono bg-amber-500/15 px-1 rounded">.env.local.example</code> para instruções.
+          </p>
+        </div>
+        <a
+          href="https://developers.facebook.com/apps"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="shrink-0 flex items-center gap-1 text-xs text-amber-400 hover:text-amber-300 transition-colors"
+        >
+          Criar App <ExternalLink className="w-3 h-3" />
+        </a>
+      </div>
+    )
+  }
+
+  if (!status.connected) {
+    return (
+      <div className="flex items-center justify-between gap-4 px-4 py-3.5 rounded-xl border border-[oklch(1_0_0_/_8%)] bg-[oklch(1_0_0_/_3%)]">
+        <div className="flex items-center gap-3">
+          <div className="w-8 h-8 rounded-full bg-pink-500/15 border border-pink-500/20 flex items-center justify-center">
+            <Camera className="w-4 h-4 text-pink-400" />
+          </div>
+          <div>
+            <p className="text-sm font-medium text-foreground">Nenhuma conta conectada</p>
+            <p className="text-xs text-muted-foreground">Conecte sua conta do Instagram Business ou Creator para sincronizar dados reais.</p>
+          </div>
+        </div>
+        <a href="/api/auth/instagram">
+          <Button className="gap-2 shrink-0">
+            <Link2 className="w-4 h-4" />
+            Conectar Instagram
+          </Button>
+        </a>
+      </div>
+    )
+  }
+
+  const acc = status.account!
+  return (
+    <div className="flex items-center justify-between gap-4 px-4 py-3 rounded-xl border border-emerald-500/20 bg-emerald-500/5">
+      <div className="flex items-center gap-3">
+        {acc.picture ? (
+          <img
+            src={acc.picture}
+            alt={acc.name}
+            className="w-9 h-9 rounded-full border border-emerald-500/30 object-cover"
+          />
+        ) : (
+          <div className="w-9 h-9 rounded-full bg-emerald-500/15 border border-emerald-500/20 flex items-center justify-center">
+            <User className="w-4 h-4 text-emerald-400" />
+          </div>
+        )}
+        <div>
+          <div className="flex items-center gap-2">
+            <p className="text-sm font-medium text-foreground">{acc.name || acc.username}</p>
+            <Badge variant="success" className="text-[10px] gap-1 py-0">
+              <div className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+              Conectado
+            </Badge>
+          </div>
+          <p className="text-xs text-muted-foreground">@{acc.username}</p>
+        </div>
+      </div>
+      <button
+        onClick={onDisconnect}
+        className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-destructive transition-colors shrink-0"
+      >
+        <Link2Off className="w-3.5 h-3.5" />
+        Desconectar
+      </button>
+    </div>
+  )
+}
+
+// ─── Page ─────────────────────────────────────────────────────────────────────
+
 export default function InstagramPage() {
   const [posts, setPosts] = useState<Post[]>(initialPosts)
   const [open, setOpen] = useState(false)
   const [form, setForm] = useState<FormState>(defaultForm)
+  const [igStatus, setIgStatus] = useState<InstagramStatus | null>(null)
+
+  // Carrega status de conexão do Instagram
+  useEffect(() => {
+    fetch("/api/auth/instagram/status")
+      .then((r) => r.json())
+      .then((d: InstagramStatus) => setIgStatus(d))
+      .catch(() => {})
+  }, [])
+
+  async function handleDisconnect() {
+    await fetch("/api/auth/instagram/disconnect", { method: "POST" })
+    setIgStatus((prev) => prev ? { ...prev, connected: false, account: undefined } : prev)
+  }
+
+  // Lê parâmetros de auth na URL após callback OAuth
+  useEffect(() => {
+    if (typeof window === "undefined") return
+    const params = new URLSearchParams(window.location.search)
+    const auth = params.get("auth")
+    if (auth) {
+      // Remove o parâmetro da URL sem recarregar
+      const url = new URL(window.location.href)
+      url.searchParams.delete("auth")
+      url.searchParams.delete("msg")
+      window.history.replaceState({}, "", url.toString())
+      // Recarrega o status
+      fetch("/api/auth/instagram/status")
+        .then((r) => r.json())
+        .then((d: InstagramStatus) => setIgStatus(d))
+        .catch(() => {})
+    }
+  }, [])
 
   const counts = {
     agendado: posts.filter((p) => p.status === "agendado").length,
@@ -312,6 +446,11 @@ export default function InstagramPage() {
           Nova Ideia
         </Button>
       </div>
+
+      {/* ── Banner de conexão ── */}
+      {igStatus && (
+        <ConnectionBanner status={igStatus} onDisconnect={handleDisconnect} />
+      )}
 
       {/* ── Stats ── */}
       <div className="grid grid-cols-2 xl:grid-cols-4 gap-3">
